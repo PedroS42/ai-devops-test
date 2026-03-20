@@ -1,6 +1,10 @@
 from groq import Groq
 from groq.types.chat import ChatCompletionUserMessageParam
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 API_KEY = os.environ.get("GROQ_API_KEY")
 
