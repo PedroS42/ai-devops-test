@@ -1,0 +1,22 @@
+name: Code Review with AI
+on: [push]
+
+jobs:
+  ai-review-job:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4.0.0
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
+
+        - name: Install dependencies
+          run: pip install groq
+
+        - name: Run AI code review
+          env:
+            GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          run: python ai_reviewer.py
