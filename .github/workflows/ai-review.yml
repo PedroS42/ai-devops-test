@@ -14,7 +14,7 @@ jobs:
             python-version: '3.10'
 
         - name: Install dependencies
-          run: pip install groq
+          run: pip install groq python-dotenv
 
         - name: Run AI code review
           env:
