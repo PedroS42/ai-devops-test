@@ -15,10 +15,10 @@ if not API_KEY:
 
 client = Groq(api_key=API_KEY)
 
-with open("codigo_com_erro.py", "r") as file:
+with open("main.tf", "r") as file:
     code_to_review = file.read()
 
-prompt = f"Act as a DevOps engineer. Check if this code has any errors, security vulnerabilities, or bad practices. If it has, you MUST start your response with the exact word 'REJECTED'. If the code is fine and safe, start with the exact word 'APPROVED'. Then provide a brief explanation. \nCode: \n{code_to_review}"
+prompt = f"Act as a Cloud security and terraform expert. Check if this code has any errors (it is meant for Azure), security vulnerabilities, invalid syntax, or bad practices. If it has, you MUST start your response with the exact word 'REJECTED'. If the code is fine and safe, start with the exact word 'APPROVED'. Then provide a brief explanation. \nTerraform Code: \n{code_to_review}"
 
 
 messages: list[ChatCompletionUserMessageParam] = [
