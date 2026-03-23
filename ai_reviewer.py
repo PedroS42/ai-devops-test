@@ -1,6 +1,6 @@
 from groq import Groq
 from groq.types.chat import ChatCompletionUserMessageParam
-import os
+import os, sys
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -18,7 +18,7 @@ client = Groq(api_key=API_KEY)
 with open("codigo_com_erro.py", "r") as file:
     code_to_review = file.read()
 
-prompt = f"Act as a DevOps engineer. Check if this code has any errors, security vulnerabilities, or bad practices. Be concise.\n\n{code_to_review}"
+prompt = f"Act as a DevOps engineer. Check if this code has any errors, security vulnerabilities, or bad practices. If it has, you MUST start your response with the exact word 'REJECTED'. If the code is fine and safe, start with the exact word 'APPROVED'. Then provide a brief explanation. \nCode: \n{code_to_review}"
 
 
 messages: list[ChatCompletionUserMessageParam] = [
@@ -35,3 +35,11 @@ response = client.chat.completions.create(
 
 print("AI Review of the Code:")
 print(response.choices[0].message.content)
+response2 = response.choices[0].message.content
+
+if response2.strip().upper().startswith("REJECTED"):
+    print("\nCRITICAL ERROR: AI has rejected this code! The pipeline will now stop.")
+    sys.exit(1) # this tells github: stop pipeline 
+else:
+    print("\nSUCCESS: AI has approved this code.")
+    sys.exit(0)
