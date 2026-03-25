@@ -13,10 +13,15 @@ jobs:
           with:
             python-version: '3.10'
 
-        - name: Install dependencies
-          run: pip install groq python-dotenv
+        - name: Install Python dependencies
+          run: pip install ollama
+
+        - name: Install and Setup Ollama
+          run: |
+            curl -fsSL https://ollama.com/install.sh | sh
+            ollama serve &
+            sleep 5
+            ollama pull llama3.1
 
         - name: Run AI code review
-          env:
-            GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           run: python ai_reviewer.py
