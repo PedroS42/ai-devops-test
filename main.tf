@@ -14,3 +14,12 @@ resource "azurerm_storage_account" "meu_armazenamento" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
+
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-terraform-state"
+    storage_account_name = "tfstatestoragedevscope"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+}
