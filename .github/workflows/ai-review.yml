@@ -42,8 +42,8 @@ jobs:
 
         - name: Terraform Init e Plan
           run: |
-              terraform init
-              terraform plan
+              terraform init -input=false
+              terraform plan -input=false
             
 
   # Job 3: Apply IaC
@@ -62,5 +62,5 @@ jobs:
 
         - name: Terraform Apply
           run: |
-              terraform init
-              terraform apply -auto-approve
+              terraform init -input=false
+              terraform apply -auto-approve -input=false
