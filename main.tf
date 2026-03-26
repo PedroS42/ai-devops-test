@@ -13,7 +13,4 @@ resource "azurerm_storage_account" "meu_armazenamento" {
   location                 = azurerm_resource_group.meu_grupo.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-
-  # Necessary so we dont allow public access to the storage account, only those with the right permissions
-  allow_nested_items_to_be_public = false
 }
