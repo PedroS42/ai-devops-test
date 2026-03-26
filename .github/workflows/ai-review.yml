@@ -1,4 +1,4 @@
-name: Code Review with AI
+name: Code Review and IaC with AI
 on: [push]
 
 jobs:
@@ -25,3 +25,42 @@ jobs:
 
         - name: Run AI code review
           run: python ai_reviewer.py
+
+  # Job 2: Setup IaC
+  terraform-plan:
+      needs: ai-review-job
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4.0.0
+        - name: Login on Azure
+          uses: azure/login@v1
+          with:
+              creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+
+        - name: Terraform Init e Plan
+          run: |
+              terraform init
+              terraform plan
+            
+
+  # Job 3: Apply IaC
+  terraform-apply:
+      needs: terraform-plan
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4.0.0
+        - name: Login on Azure
+          uses: azure/login@v1
+          with:
+              creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+
+        - name: Terraform Apply
+          run: |
+              terraform init
+              terraform apply -auto-approve
