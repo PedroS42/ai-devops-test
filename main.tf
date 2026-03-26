@@ -4,7 +4,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "meu_grupo" {
   name     = "rg-estagio-devscope"
-  location = "West Europe"
+  location = "Spain Central"
 }
 
 resource "azurerm_storage_account" "meu_armazenamento" {
