@@ -1,8 +1,5 @@
 name: Central Pipeline Validator
-on:
-    push:
-        paths:
-        - '.github/workflows/**'
+on: [push]
 
 permissions:
   contents: read
@@ -10,9 +7,10 @@ permissions:
 jobs:
   ai-pipeline-audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
         - name: Checkout code
-          uses: actions/checkout@v4.0.0
+          uses: actions/checkout@v4
 
         - name: Set up Python
           uses: actions/setup-python@v5

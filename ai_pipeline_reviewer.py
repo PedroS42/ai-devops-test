@@ -24,11 +24,12 @@ for file in pipelines_files:
     prompt = (f"Act as a DevSecOps Engineer and CI/CD specialist.\n"
               f"Review the following GitHub Action YAML file.\n"
               f"Look for:\n"
-              f"1 - Hardcoded secrets or tokens.\n"
-              f"2 - Outdated actions.\n"
-              f"3 - Missing Best practices (missing timeouts, dangerous permissions).\n"
-              f"If you find any security flaws or critical bad practices, start your response exactly with 'REJECTED'.\n"
-              f"If the YAML is secure and follows best practices, start with 'APPROVED'.\n"
+              f"1 - Hardcoded secrets or tokens (IGNORE standard GitHub Secrets syntax like ${{{{ secrets.XYZ }}}}).\n"
+              f"2 - Outdated actions (e.g., recommend v4 instead of v4.0.0).\n"
+              f"3 - Missing Best practices (missing timeouts on jobs, lack of specific permissions).\n"
+              f"4 - Dangerous practices (but allow -auto-approve for Terraform if it is a standard automated CI/CD flow).\n"
+              f"If you find any undeniable, critical security flaws, start your response exactly with 'REJECTED'.\n"
+              f"If the YAML is generally secure, start with 'APPROVED'. Do not reject for minor stylistic issues.\n"
               f"Provide a concise explanation.\n\n"
               f"YAML Code:\n{yaml_content}")
 
