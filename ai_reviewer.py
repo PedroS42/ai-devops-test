@@ -35,7 +35,3 @@ if response_text.strip().upper().startswith("REJECTED"):
 else:
     print("\nSUCCESS: AI has approved this code.")
     sys.exit(0)
-
-
-
-# TODO: 1 - ADICIONAR PIPELINE QUE VALIDA OUTRAS PIPELINES | 2 - DAR UPDATE AO YAML PARA FUNCIONAR COM O AZURE E REALMENTE CRIAR OS RESOURCES

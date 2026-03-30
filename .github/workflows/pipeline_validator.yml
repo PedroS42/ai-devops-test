@@ -1,0 +1,33 @@
+name: Central Pipeline Validator
+on:
+    push:
+        paths:
+        - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  ai-pipeline-audit:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4.0.0
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
+
+        - name: Install Python dependencies
+          run: pip install ollama
+
+        - name: Install and Setup Ollama
+          run: |
+            curl -fsSL https://ollama.com/install.sh | sh
+            ollama serve &
+            sleep 5
+            ollama pull llama3.1
+
+        - name: Run AI pipeline audit
+          run: python ai_pipeline_reviewer.py
