@@ -6,6 +6,9 @@ on:
     types:
       - completed
 
+env:
+  FAKE_SECRET: "12345"
+
 jobs:
   ai-review-job:
     runs-on: ubuntu-latest
