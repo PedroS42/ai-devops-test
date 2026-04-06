@@ -1,12 +1,23 @@
-import ollama
+from groq import Groq
+from groq.types.chat import ChatCompletionUserMessageParam
+from dotenv import load_dotenv
 import sys
 import glob
 import os
 import requests
 
+load_dotenv()
+
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 REPO_NAME = os.environ.get("REPO_NAME")
 PR_NUMBER = os.environ.get("PR_NUMBER")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+
+if not GROQ_API_KEY:
+    print("\nERROR: No API key found in environment variables.")
+    sys.exit(1)
+
+client = Groq(api_key=GROQ_API_KEY)
 
 
 def publicar_comentario_github(comentario):
@@ -51,39 +62,26 @@ for file in pipelines_files:
     with open(file, "r") as f:
         yaml_content = f.read()
 
-        prompt = (f"Act as a strict DevSecOps Engineer and CI/CD specialist.\n"
-                  f"Review the following GitHub Action YAML file.\n"
-                  f"You must evaluate the file based on these strict rules:\n\n"
-                  f"1. SECRETS (CRITICAL RULE): Examine all 'env' variables and 'with' inputs. \n"
-                  f"   - ALLOWED: Standard GitHub Secrets syntax (Example: `${{{{ secrets.MY_TOKEN }}}}`).\n"
-                  f"   - REJECTED: Any hardcoded strings that look like cloud credentials, API keys, or tokens (Example: `AZURE_SECRET: \"a1b2c3...\"`). If a hardcoded secret exists anywhere in the file, even if it is just defined and never used, YOU MUST REJECT IT.\n"
-                  f"2. OUTDATED ACTIONS: Recommend latest major versions (e.g., v4 instead of v4.0.0).\n"
-                  f"3. BEST PRACTICES: Check for explicit job timeouts and scoped permissions.\n"
-                  f"4. DANGEROUS PRACTICES: Flag risky bash scripts, but explicitly allow '-auto-approve' in Terraform steps for CI/CD flows.\n\n"
-                  f"If the file violates the SECRETS rule or has critical flaws, start your response EXACTLY with 'REJECTED'.\n"
-                  f"If the file is secure and compliant, start your response EXACTLY with 'APPROVED'.\n"
-                  f"Provide a concise explanation of your findings.\n\n"
+        prompt = (f"Act as a DevSecOps CI/CD expert.\n"
+                  f"Review this GitHub Action YAML and evaluate based on these rules:\n\n"
+                  f"1. SECRETS: Look for hardcoded credentials, API keys, or tokens. ONLY `${{{{ secrets.XYZ }}}}` is allowed. Any hardcoded secret, even if unused, must be REJECTED.\n"
+                  f"2. ACTIONS: Flag outdated actions (e.g. prefer v4 over v4.0.0).\n"
+                  f"3. BEST PRACTICES: Ensure explicit timeouts and appropriate permissions happen.\n"
+                  f"4. DANGEROUS PRACTICES: Flag risky scripts, but '-auto-approve' in terraform apply is ALLOWED.\n\n"
+                  f"If it violates any rule, start your response with 'REJECTED'.\n"
+                  f"If perfectly secure, start with 'APPROVED'. Explain your findings concisely.\n\n"
                   f"YAML Code:\n{yaml_content}")
 
-    response = ollama.chat(
-        model="llama3.1",
-        messages=[{
-            "role": "user",
-            "content": prompt
-        }],
-        stream=True,
-        options={
-            "temperature": 0.0
-        }
+    messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": prompt}]
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=messages,
+        temperature=0.0
     )
 
-    response_text = ""
-
-    for chunk in response:
-        content = chunk["message"]["content"]
-        print(content, end="", flush=True)
-        response_text += content
-
+    response_text = response.choices[0].message.content
+    print(response_text)
     print("\n")
 
     # Append the AI's response for this file to the overall PR comment
