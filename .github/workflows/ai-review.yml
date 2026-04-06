@@ -7,7 +7,8 @@ on:
       - completed
 
 env:
-  FAKE_SECRET: "12345"
+  AZURE_CLIENT_SECRET: "a1f2h3z4-e5f67890-6489032170ab"
+  AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7"
 
 jobs:
   ai-review-job:
