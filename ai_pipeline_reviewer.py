@@ -51,17 +51,19 @@ for file in pipelines_files:
     with open(file, "r") as f:
         yaml_content = f.read()
 
-    prompt = (f"Act as a DevSecOps Engineer and CI/CD specialist.\n"
-              f"Review the following GitHub Action YAML file.\n"
-              f"Look for:\n"
-              f"1 - Hardcoded secrets or tokens (IGNORE standard GitHub Secrets syntax like ${{{{ secrets.XYZ }}}}).\n"
-              f"2 - Outdated actions (e.g., recommend v4 instead of v4.0.0).\n"
-              f"3 - Missing Best practices (missing timeouts on jobs, lack of specific permissions).\n"
-              f"4 - Dangerous practices (but allow -auto-approve for Terraform if it is a standard automated CI/CD flow).\n"
-              f"If you find any undeniable, critical security flaws, start your response exactly with 'REJECTED'.\n"
-              f"If the YAML is generally secure, start with 'APPROVED'. Do not reject for minor stylistic issues.\n"
-              f"Provide a concise explanation.\n\n"
-              f"YAML Code:\n{yaml_content}")
+        prompt = (f"Act as a strict DevSecOps Engineer and CI/CD specialist.\n"
+                  f"Review the following GitHub Action YAML file.\n"
+                  f"You must evaluate the file based on these strict rules:\n\n"
+                  f"1. SECRETS (CRITICAL RULE): Examine all 'env' variables and 'with' inputs. \n"
+                  f"   - ALLOWED: Standard GitHub Secrets syntax (Example: `${{{{ secrets.MY_TOKEN }}}}`).\n"
+                  f"   - REJECTED: Any hardcoded strings that look like cloud credentials, API keys, or tokens (Example: `AZURE_SECRET: \"a1b2c3...\"`). If a hardcoded secret exists anywhere in the file, even if it is just defined and never used, YOU MUST REJECT IT.\n"
+                  f"2. OUTDATED ACTIONS: Recommend latest major versions (e.g., v4 instead of v4.0.0).\n"
+                  f"3. BEST PRACTICES: Check for explicit job timeouts and scoped permissions.\n"
+                  f"4. DANGEROUS PRACTICES: Flag risky bash scripts, but explicitly allow '-auto-approve' in Terraform steps for CI/CD flows.\n\n"
+                  f"If the file violates the SECRETS rule or has critical flaws, start your response EXACTLY with 'REJECTED'.\n"
+                  f"If the file is secure and compliant, start your response EXACTLY with 'APPROVED'.\n"
+                  f"Provide a concise explanation of your findings.\n\n"
+                  f"YAML Code:\n{yaml_content}")
 
     response = ollama.chat(
         model="llama3.1",
