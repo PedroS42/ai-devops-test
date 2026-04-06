@@ -1,7 +1,33 @@
 import ollama
 import sys
 import glob
+import os
+import requests
 
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
+REPO_NAME = os.environ.get("REPO_NAME")
+PR_NUMBER = os.environ.get("PR_NUMBER")
+
+
+def publicar_comentario_github(comentario):
+    if not PR_NUMBER or not GITHUB_TOKEN or not REPO_NAME:
+        print(
+            "Aviso: Não estou a correr numa Pull Request ou faltam credenciais do GitHub. A imprimir apenas no terminal:")
+        print(comentario)
+        return
+
+    url = f"https://api.github.com/repos/{REPO_NAME}/issues/{PR_NUMBER}/comments"
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    data = {"body": comentario}
+
+    resposta = requests.post(url, headers=headers, json=data)
+    if resposta.status_code == 201:
+        print("✅ Comentário publicado na Pull Request com sucesso!")
+    else:
+        print(f"❌ Erro ao publicar comentário: {resposta.status_code} - {resposta.text}")
 
 workflows_folders = [".github/workflows/*.yml", ".github/workflows/*.yaml"]
 pipelines_files = []
@@ -14,6 +40,10 @@ if not pipelines_files:
     sys.exit(0)
 
 has_failures = False
+
+
+pr_comment = "AIOps Pipeline Review\n\nI am the AI Agent responsible for reviewing the YAML files. Here are the results:\n\n"
+
 
 for file in pipelines_files:
     print("Analyzing: " + file)
@@ -54,6 +84,10 @@ for file in pipelines_files:
 
     print("\n")
 
+    # Append the AI's response for this file to the overall PR comment
+    pr_comment += f"### 📄 File: `{file}`\n{response_text}\n\n---\n"
+
+
     if response_text.strip().upper().startswith("REJECTED"):
         print(f"❌ CRITICAL ERROR: AI has rejected the code in {file}!")
         has_failures = True
@@ -62,6 +96,7 @@ for file in pipelines_files:
 
 if has_failures:
     print("\nERROR: Pipeline failed because one or more workflows were rejected")
+    publicar_comentario_github(pr_comment)
     sys.exit(1)
 else:
     print("\nSUCCESS: All pipelines succeeded")
