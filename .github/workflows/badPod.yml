@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod
+spec:
+  containers:
+  - name: badcontainer
+    image: busybox
+    command: ["sh", "-c", 'echo "Initiating payment system..."; sleep 2; echo "FATAL ERROR: NO MEMORY AVAILABLE"; EXIT 1;']

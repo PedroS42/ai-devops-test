@@ -23,7 +23,7 @@ messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": pr
 response = client.chat.completions.create(
     model="llama-3.3-70b-versatile",
     messages=messages,
-    temperature=0.0
+    temperature=0.1
 )
 
 response_text = response.choices[0].message.content
