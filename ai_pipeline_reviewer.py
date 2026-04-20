@@ -100,4 +100,5 @@ if has_failures:
     sys.exit(1)
 else:
     print("\nSUCCESS: All pipelines succeeded")
+    publicar_comentario_github(pr_comment)
     sys.exit(0)
