@@ -1,0 +1,8 @@
+environment = "prod"
+location     = "East US"
+resource_group_name = "myproject-prod-rg"
+storage_account_name = "myprojectprodstorage"
+app_service_name    = "myproject-prod-app"
+database_name         = "myproject_prod_db"
+database_username     = "myproject_prod_user"
+database_password     = "myproject_prod_password"
