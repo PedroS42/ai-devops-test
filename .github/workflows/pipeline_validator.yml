@@ -4,7 +4,7 @@ on:
         branches: ["main"]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 env:
@@ -31,3 +31,9 @@ jobs:
 
         - name: Run AI pipeline audit
           run: python ai_pipeline_reviewer.py
+
+        - name: Auto-merge PR
+          if: success()
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: gh pr merge ${{ github.event.pull_request.number }} --squash
