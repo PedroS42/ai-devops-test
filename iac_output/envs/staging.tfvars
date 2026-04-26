@@ -1,0 +1,8 @@
+environment = "staging"
+location     = "West US"
+resource_group_name = "myproject-staging-rg"
+storage_account_name = "myprojectstagingstorage"
+app_service_name    = "myproject-staging-app"
+database_name         = "myproject_staging_db"
+database_username     = "myproject_staging_user"
+database_password     = "myproject_staging_password"
