@@ -64,7 +64,8 @@ def main():
 
     prompt = (f"Act as an expert Code Reviewer. Review the following pull request diff. "
               f"Look for any bugs, security vulnerabilities, architectural flaws, or bad practices. "
-              f"If the code looks good, briefly praise the author. "
+              f"If it has critical issues, you MUST start your response with the exact word 'REJECTED'. "
+              f"If the code looks good and safe, start your response with the exact word 'APPROVED'. "
               f"Format your response neatly in markdown.\n\n"
               f"PR Diff:\n```diff\n{diff_content}\n```")
 
@@ -79,6 +80,12 @@ def main():
     print(review_comment)
     publish_github_comment(review_comment)
 
+    if response.choices[0].message.content.strip().upper().startswith("REJECTED"):
+        print("\nCRITICAL ERROR: AI has rejected this pull request! The pipeline will now stop.")
+        sys.exit(1)
+    else:
+        print("\nSUCCESS: AI has approved this pull request.")
+        sys.exit(0)
+
 if __name__ == "__main__":
     main()
-

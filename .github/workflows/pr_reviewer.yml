@@ -34,4 +34,9 @@ jobs:
 
         - name: Run AI PR Code Review
           run: python ai_pr_reviewer.py
-
+          
+        - name: Auto-merge PR
+          if: success()
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: gh pr merge ${{ github.event.pull_request.number }} --squash --yes
