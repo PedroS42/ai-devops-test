@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import subprocess
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -19,8 +20,17 @@ client = Groq(api_key=GROQ_API_KEY)
 
 def get_pr_diff():
     if not PR_NUMBER or not GITHUB_TOKEN or not REPO_NAME:
-        print("Missing GitHub credentials. Cannot fetch PR diff.")
-        return None
+        print("Missing GitHub credentials. Attempting to fetch local git diff...")
+        try:
+            # Try to get diff against main (simulating a PR)
+            result = subprocess.run(["git", "diff", "main"], capture_output=True, text=True)
+            if not result.stdout.strip():
+                # Fallback to uncommitted/staged changes if no difference with main
+                result = subprocess.run(["git", "diff", "HEAD"], capture_output=True, text=True)
+            return result.stdout if result.stdout.strip() else None
+        except Exception as e:
+            print(f"Failed to fetch local git diff: {e}")
+            return None
 
     url = f"https://api.github.com/repos/{REPO_NAME}/pulls/{PR_NUMBER}"
     headers = {
