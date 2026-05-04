@@ -1,15 +1,17 @@
-# Output the storage account URL
-output "storage_account_url" {
-  value = azurerm_storage_account.storage.primary_web_endpoint
+# Output database connection details
+output "database_name" {
+  value = azurerm_postgresql_database.myproject.name
 }
 
-# Output the web app URL
-output "web_app_url" {
-  value = azurerm_linux_web_app.app.default_hostname
+output "database_username" {
+  value = var.database_username
 }
 
-# Output the database connection string
-output "database_connection_string" {
-  value = "host=${azurerm_postgresql_server.database.fqdn} port=5432 dbname=${azurerm_postgresql_database.db.name} user=${var.database_username} password=${var.database_password} sslmode=require"
+output "database_password" {
+  value = var.database_password
   sensitive = true
+}
+
+output "database_host" {
+  value = azurerm_postgresql_server.myproject.fqdn
 }
