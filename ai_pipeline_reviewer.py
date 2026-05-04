@@ -5,6 +5,7 @@ import sys
 import glob
 import os
 import requests
+import config_manager
 
 load_dotenv()
 
@@ -74,8 +75,11 @@ for file in pipelines_files:
 
     messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": prompt}]
 
+    app_config = config_manager.load_config()
+    target_model = app_config.get("pipeline_review", "llama-3.3-70b-versatile")
+
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=messages,
         temperature=0.1
     )

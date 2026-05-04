@@ -1,0 +1,6 @@
+iac_generation: deepseek-r1-distill-llama-70b
+pipeline_review: llama-3.3-70b-versatile
+self_healing: llama-3.3-70b-versatile
+cost_estimation: llama-3.3-70b-versatile
+pr_review: llama-3.3-70b-versatile
+iac_validation: llama-3.3-70b-versatile
