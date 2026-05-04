@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from groq.types.chat import ChatCompletionUserMessageParam
 import glob
+import config_manager
 
 load_dotenv()
 
@@ -34,8 +35,11 @@ for file_path in tf_files:
 
     messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": prompt}]
 
+    app_config = config_manager.load_config()
+    target_model = app_config.get("iac_validation", "llama-3.3-70b-versatile")
+
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=messages,
         temperature=0.1
     )

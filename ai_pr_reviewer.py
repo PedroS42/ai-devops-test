@@ -4,6 +4,7 @@ import requests
 import subprocess
 from groq import Groq
 from dotenv import load_dotenv
+import config_manager
 
 load_dotenv()
 
@@ -79,8 +80,11 @@ def main():
               f"Format your response neatly in markdown.\n\n"
               f"PR Diff:\n```diff\n{diff_content}\n```")
 
+    app_config = config_manager.load_config()
+    target_model = app_config.get("pr_review", "llama-3.3-70b-versatile")
+
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1
     )

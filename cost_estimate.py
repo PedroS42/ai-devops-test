@@ -5,6 +5,7 @@ import subprocess
 
 from dotenv import load_dotenv
 from groq import Groq
+import config_manager
 
 GREEN = '\033[92m'
 YELLOW = '\033[93m'
@@ -61,8 +62,11 @@ def finops_ai_analysis(client, infracost_data):
         Keep it professional, objective and well-formatted.
         """
 
+    app_config = config_manager.load_config()
+    target_model = app_config.get("cost_estimation", "llama-3.3-70b-versatile")
+
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1
     )

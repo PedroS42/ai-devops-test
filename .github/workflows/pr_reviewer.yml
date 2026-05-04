@@ -30,7 +30,7 @@ jobs:
             python-version: '3.10'
 
         - name: Install Python dependencies
-          run: pip install groq requests python-dotenv
+          run: pip install groq requests python-dotenv pyyaml
 
         - name: Run AI PR Code Review
           run: python ai_pr_reviewer.py

@@ -3,6 +3,7 @@ from groq import Groq
 import os
 import re
 import sys
+import config_manager
 
 load_dotenv()
 
@@ -67,9 +68,11 @@ def generate_iac(dir, cloud, desc, proj_name, envs):
     
     Do not add extra explanations outside of the file blocks. Just output the files."""
 
+    app_config = config_manager.load_config()
+    target_model = app_config.get("iac_generation", "llama-3.3-70b-versatile")
 
     answer = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=target_model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.2
     )

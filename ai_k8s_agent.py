@@ -5,6 +5,7 @@ from groq.types.chat import ChatCompletionUserMessageParam
 from kubernetes import client, config
 from groq import Groq
 from dotenv import load_dotenv
+import config_manager
 
 load_dotenv()
 
@@ -67,8 +68,11 @@ for pod in pods.items:
 
         messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": prompt}]
 
+        app_config = config_manager.load_config()
+        target_model = app_config.get("self_healing", "llama-3.3-70b-versatile")
+
         resposta = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=target_model,
             messages=messages,
             temperature=0.1
         )
