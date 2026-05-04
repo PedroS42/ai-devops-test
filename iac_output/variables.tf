@@ -6,7 +6,7 @@ variable "environment" {
 
 variable "location" {
   type        = string
-  description = "Location for all resources"
+  description = "Azure location"
 }
 
 variable "resource_group_name" {
@@ -14,28 +14,18 @@ variable "resource_group_name" {
   description = "Resource group name"
 }
 
-variable "storage_account_name" {
-  type        = string
-  description = "Storage account name"
-}
-
-variable "app_service_name" {
-  type        = string
-  description = "App service name"
-}
-
 variable "database_name" {
   type        = string
-  description = "Database name"
+  description = "PostgreSQL database name"
 }
 
 variable "database_username" {
   type        = string
-  description = "Database username"
+  description = "PostgreSQL database username"
 }
 
 variable "database_password" {
   type        = string
   sensitive   = true
-  description = "Database password"
+  description = "PostgreSQL database password"
 }
