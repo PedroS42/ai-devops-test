@@ -3,6 +3,7 @@ import sys
 import requests
 import subprocess
 from groq import Groq
+from groq.types.chat import ChatCompletionUserMessageParam
 from dotenv import load_dotenv
 import config_manager
 
@@ -19,19 +20,26 @@ if not GROQ_API_KEY:
 
 client = Groq(api_key=GROQ_API_KEY)
 
+
+def _read_git_diff(*git_args):
+    result = subprocess.run(
+        ["git", *git_args],
+        capture_output=True,
+        check=True,
+    )
+    return result.stdout.decode("utf-8", errors="replace").strip()
+
 def get_pr_diff():
     if not PR_NUMBER or not GITHUB_TOKEN or not REPO_NAME:
         print("Missing GitHub credentials. Attempting to fetch local git diff...")
-        try:
-            # Try to get diff against main (simulating a PR)
-            result = subprocess.run(["git", "diff", "main"], capture_output=True, text=True)
-            if not result.stdout.strip():
-                # Fallback to uncommitted/staged changes if no difference with main
-                result = subprocess.run(["git", "diff", "HEAD"], capture_output=True, text=True)
-            return result.stdout if result.stdout.strip() else None
-        except Exception as e:
-            print(f"Failed to fetch local git diff: {e}")
-            return None
+        for git_args in (("diff", "--no-color", "main"), ("diff", "--no-color", "HEAD"), ("diff", "--no-color", "--cached")):
+            try:
+                diff_text = _read_git_diff(*git_args)
+                if diff_text:
+                    return diff_text
+            except (subprocess.CalledProcessError, FileNotFoundError, UnicodeDecodeError) as e:
+                print(f"Local git diff attempt {' '.join(git_args)} failed: {e}")
+        return None
 
     url = f"https://api.github.com/repos/{REPO_NAME}/pulls/{PR_NUMBER}"
     headers = {
@@ -83,9 +91,11 @@ def main():
     app_config = config_manager.load_config()
     target_model = app_config.get("pr_review", "llama-3.3-70b-versatile")
 
+    messages: list[ChatCompletionUserMessageParam] = [{"role": "user", "content": prompt}]
+
     response = client.chat.completions.create(
         model=target_model,
-        messages=[{"role": "user", "content": prompt}],
+        messages=messages,
         temperature=0.1
     )
 
